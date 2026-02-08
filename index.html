@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HAPPY BIRTHDAY JIM 🎈🎂</title>
+  <meta name="description" content="A completely normal, not-at-all obnoxious birthday page." />
+
+  <style>
+    :root{
+      --bg1:#ff5aa5;
+      --bg2:#7c4dff;
+      --bg3:#00d4ff;
+      --card:#ffffffdd;
+      --ink:#111;
+      --shadow: 0 18px 60px rgba(0,0,0,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      overflow-x:hidden;
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,255,255,.25), transparent 60%),
+        radial-gradient(1000px 650px at 90% 20%, rgba(255,255,255,.22), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 55%, var(--bg3));
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      position:relative;
+    }
+
+    .card{
+      width:min(980px, 100%);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.6);
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .header{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(28px, 4.2vw, 56px);
+      letter-spacing:0.5px;
+      line-height:1.0;
+      text-shadow: 0 4px 0 rgba(255,255,255,.45);
+    }
+
+    .sub{
+      margin:0;
+      font-size:clamp(14px, 1.9vw, 18px);
+      opacity:.85;
+    }
+
+    .pillRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      border-radius:999px;
+      padding:10px 14px;
+      border:1px dashed rgba(0,0,0,.25);
+      background:rgba(255,255,255,.65);
+      font-weight:700;
+      letter-spacing:.2px;
+      user-select:none;
+    }
+
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+    }
+
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+      .pillRow{ justify-content:flex-start; }
+    }
+
+    .panel{
+      border-radius:22px;
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(0,0,0,.08);
+      padding:16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.10);
+      position:relative;
+    }
+
+    .hero{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .bigButton{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    button{
+      appearance:none;
+      border:none;
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      transform: translateY(0);
+      transition: transform .08s ease, filter .12s ease;
+    }
+    button:active{ transform: translateY(2px); }
+
+    .btnStart{
+      background:linear-gradient(135deg, #00ff9d, #00d4ff);
+    }
+    .btnStop{
+      background:linear-gradient(135deg, #ffd166, #ff6b6b);
+    }
+    .btnConfetti{
+      background:linear-gradient(135deg, #baffc9, #bae1ff);
+    }
+
+    .note{
+      margin:0;
+      font-size:14px;
+      opacity:.85;
+      line-height:1.35;
+    }
+
+    .audioBox{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .meter{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.08);
+      overflow:hidden;
+    }
+
+    .meter > i{
+      display:block;
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, #7c4dff, #ff5aa5, #00d4ff);
+      transition: width .12s linear;
+    }
+
+    .time{
+      font-variant-numeric: tabular-nums;
+      font-weight:800;
+      opacity:.85;
+    }
+
+    .balloons{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.9;
+      filter: drop-shadow(0 10px 10px rgba(0,0,0,.12));
+    }
+    .balloon{
+      position:absolute;
+      width:90px;
+      height:120px;
+      border-radius: 50% 50% 45% 45%;
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.75), transparent 38%),
+                  linear-gradient(135deg, rgba(255,255,255,.15), rgba(0,0,0,.08));
+      animation: floatUp linear infinite;
+    }
+    .balloon:after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-10px;
+      width:10px;
+      height:14px;
+      background:inherit;
+      transform: translateX(-50%) rotate(18deg);
+      border-radius: 0 0 10px 10px;
+      filter: brightness(.95);
+    }
+    .string{
+      position:absolute;
+      left:50%;
+      bottom:-110px;
+      width:2px;
+      height:110px;
+      background: rgba(0,0,0,.18);
+      transform: translateX(-50%);
+      border-radius:999px;
+    }
+
+    @keyframes floatUp{
+      from { transform: translateY(20px); }
+      to   { transform: translateY(-26px); }
+    }
+
+    .footer{
+      margin-top:14px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      opacity:.85;
+      font-size:13px;
+    }
+
+    /* confetti canvas */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:999;
+    }
+
+    /* small “sparkle” overlay inside card */
+    .sparkle{
+      position:absolute;
+      inset:-40px;
+      background:
+        radial-gradient(2px 2px at 10% 15%, rgba(255,255,255,.85), transparent 60%),
+        radial-gradient(2px 2px at 30% 35%, rgba(255,255,255,.7), transparent 60%),
+        radial-gradient(2px 2px at 65% 25%, rgba(255,255,255,.75), transparent 60%),
+        radial-gradient(2px 2px at 80% 55%, rgba(255,255,255,.7), transparent 60%),
+        radial-gradient(2px 2px at 55% 70%, rgba(255,255,255,.75), transparent 60%),
+        radial-gradient(2px 2px at 20% 75%, rgba(255,255,255,.75), transparent 60%);
+      opacity:.45;
+      transform: rotate(-6deg);
+      pointer-events:none;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="wrap">
+    <div class="card" role="main" aria-label="Happy Birthday Page">
+      <div class="sparkle"></div>
+
+      <div class="balloons" aria-hidden="true">
+        <!-- Balloons: edit colors by changing --c on each balloon -->
+        <div class="balloon" style="--c:#ff2d55; left:6%; top:62%; animation-duration:4.8s; background:
+          radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
+          linear-gradient(135deg, #ff2d55, #ffa3c2);">
+          <div class="string"></div>
+        </div>
+
+        <div class="balloon" style="--c:#34c759; left:16%; top:18%; animation-duration:5.4s; background:
+          radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
+          linear-gradient(135deg, #34c759, #baffc9);">
+          <div class="string"></div>
+        </div>
+
+        <div class="balloon" style="--c:#007aff; left:78%; top:14%; animation-duration:6.2s; background:
+          radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
+          linear-gradient(135deg, #007aff, #9dd6ff);">
+          <div class="string"></div>
+        </div>
+
+        <div class="balloon" style="--c:#ffd60a; left:88%; top:58%; animation-duration:5.0s; background:
+          radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
+          linear-gradient(135deg, #ffd60a, #fff2a8);">
+          <div class="string"></div>
+        </div>
+      </div>
+
+      <div class="header">
+        <div class="title">
+          <h1>HAPPY BIRTHDAY, JIM!!! 🎂🎈</h1>
+          <p class="sub">Official Celebration Portal. Extremely serious. Extremely tasteful. Definitely not annoying.</p>
+        </div>
+
+        <div class="pillRow">
+          <div class="pill">BALLOONS: ✅</div>
+          <div class="pill">CONFETTI: ✅</div>
+          <div class="pill">BIRTHDAY ENERGY: MAX</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="panel hero">
+          <h2 style="margin:0; font-size:22px;">Press this. It’s your birthday now.</h2>
+          <p class="note">
+            Modern browsers block true autoplay with sound until you click something (because society has learned, painfully,
+            that humans cannot be trusted). So this button starts the music and unlocks the party.
+          </p>
+
+          <div class="bigButton">
+            <button class="btnStart" id="startBtn" type="button">▶ START THE PARTY</button>
+            <button class="btnStop" id="stopBtn" type="button">⏸ STOP THE MUSIC (for cowards)</button>
+            <button class="btnConfetti" id="confettiBtn" type="button">🎉 MORE CONFETTI</button>
+          </div>
+
+          <div class="meter" aria-label="Playback progress">
+            <i id="bar"></i>
+          </div>
+
+          <div class="row">
+            <div class="time" id="time">0:00 / 5:00</div>
+            <div class="time" id="status">ready</div>
+          </div>
+
+          <p class="note" style="margin-top:2px;">
+            Music loops by default once started. You can pause it because this is a birthday page, not a crime.
+          </p>
+        </section>
+
+        <aside class="panel audioBox">
+          <h2 style="margin:0; font-size:18px;">Audio Controls</h2>
+
+          <audio id="player" preload="auto" loop controls style="width:100%;">
+            <!-- Put the MP3 in the same folder as index.html -->
+            <source src="happy-birthday-jim-5min-loop.mp3" type="audio/mpeg" />
+            Your browser refuses to party.
+          </audio>
+
+          <p class="note">
+            If you’re hosting on GitHub Pages, just commit <b>index.html</b> and <b>happy-birthday-jim-5min-loop.mp3</b>
+            into the repo root and enable Pages.
+          </p>
+
+          <div class="panel" style="background:rgba(255,255,255,.8);">
+            <h3 style="margin:0 0 8px 0;">Birthday Message</h3>
+            <p class="note" style="margin:0;">
+              Jim, congratulations on surviving another year on Earth. Statistically impressive.
+              Enjoy the balloons. You’re welcome.
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="footer">
+        <div>Made with love, spite, and a suspicious amount of confetti.</div>
+        <div>Tip: click “MORE CONFETTI” if the vibes drop.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== BASIC AUDIO UX ======
+    const player = document.getElementById("player");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const confettiBtn = document.getElementById("confettiBtn");
+    const bar = document.getElementById("bar");
+    const timeEl = document.getElementById("time");
+    const statusEl = document.getElementById("status");
+
+    function fmtTime(sec){
+      sec = Math.max(0, Math.floor(sec));
+      const m = Math.floor(sec/60);
+      const s = String(sec%60).padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    async function startParty(){
+      try{
+        await player.play();
+        statusEl.textContent = "playing";
+        burstConfetti(240);
+      }catch(e){
+        statusEl.textContent = "click blocked autoplay";
+      }
+    }
+
+    function stopMusic(){
+      player.pause();
+      statusEl.textContent = "paused";
+    }
+
+    startBtn.addEventListener("click", startParty);
+    stopBtn.addEventListener("click", stopMusic);
+
+    player.addEventListener("play", () => statusEl.textContent = "playing");
+    player.addEventListener("pause", () => statusEl.textContent = "paused");
+
+    // Progress bar (uses currentTime; duration may vary by encoding, so we clamp to 5:00 display)
+    const DISPLAY_TOTAL = 300; // 5 minutes
+    function tick(){
+      const t = player.currentTime || 0;
+      const pct = Math.min(100, (t / DISPLAY_TOTAL) * 100);
+      bar.style.width = pct + "%";
+      timeEl.textContent = `${fmtTime(t)} / 5:00`;
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // ====== CONFETTI (CANVAS) ======
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    let W = canvas.width = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+
+    window.addEventListener("resize", () => {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    });
+
+    const confetti = [];
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+
+    function addConfetti(n){
+      for(let i=0;i<n;i++){
+        confetti.push({
+          x: rand(0, W),
+          y: rand(-20, H * 0.25),
+          vx: rand(-2.0, 2.0),
+          vy: rand(2.5, 6.0),
+          r: rand(3, 8),
+          a: rand(0, Math.PI * 2),
+          va: rand(-0.18, 0.18),
+          life: rand(140, 220)
+        });
+      }
+    }
+
+    function burstConfetti(n){
+      addConfetti(n);
+    }
+
+    confettiBtn.addEventListener("click", () => burstConfetti(400));
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.save();
+      for(let i=confetti.length-1;i>=0;i--){
+        const p = confetti[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.a += p.va;
+        p.vx *= 0.995;
+        p.vy *= 0.998;
+        p.life -= 1;
+
+        // Wrap a bit
+        if(p.x < -20) p.x = W + 20;
+        if(p.x > W + 20) p.x = -20;
+
+        // If offscreen or dead, remove
+        if(p.y > H + 30 || p.life <= 0){
+          confetti.splice(i,1);
+          continue;
+        }
+
+        // Color cycle without specifying “a theme palette” too rigidly
+        const hue = (p.y * 0.8 + p.x * 0.2) % 360;
+        ctx.fillStyle = `hsla(${hue}, 95%, 60%, 0.9)`;
+
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.a);
+        ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
+        ctx.setTransform(1,0,0,1,0,0);
+      }
+      ctx.restore();
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // A small celebratory burst on load (silent, because autoplay is blocked anyway)
+    burstConfetti(160);
+  </script>
+</body>
+</html>
