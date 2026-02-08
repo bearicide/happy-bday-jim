@@ -530,9 +530,14 @@
       const W = window.innerWidth;
       const H = window.innerHeight;
 
-      // Soft fade background (gives trail + "flash" feeling)
-      vctx.fillStyle = "rgba(0,0,0,0.12)";
-      vctx.fillRect(0, 0, W, H);
+     // HARDER FLASH BACKGROUND (beat-reactive)
+const flash = bassNorm * 0.45; // <- crank annoyance here (0.3–0.6)
+vctx.fillStyle = `rgba(255,255,255,${flash})`;
+vctx.fillRect(0, 0, W, H);
+
+// Quick fade after flash
+vctx.fillStyle = "rgba(0,0,0,0.18)";
+vctx.fillRect(0, 0, W, H);
 
       // If not running yet, draw a gentle idle shimmer
       if (!analyser || !data || player.paused){
