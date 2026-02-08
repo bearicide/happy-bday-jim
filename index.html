@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HAPPY BIRTHDAY JIM 🎈🎂</title>
-  <meta name="description" content="A completely normal, not-at-all obnoxious birthday page." />
+  <meta name="description" content="Cheesy birthday page with balloons, confetti, and an audio-reactive visualizer." />
 
   <style>
     :root{
@@ -14,6 +14,7 @@
       --card:#ffffffdd;
       --ink:#111;
       --shadow: 0 18px 60px rgba(0,0,0,.25);
+      --glass: rgba(255,255,255,.70);
     }
 
     *{ box-sizing:border-box; }
@@ -22,20 +23,38 @@
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--ink);
-      overflow-x:hidden;
+      overflow:hidden;
       background:
         radial-gradient(1200px 700px at 10% 10%, rgba(255,255,255,.25), transparent 60%),
         radial-gradient(1000px 650px at 90% 20%, rgba(255,255,255,.22), transparent 55%),
         linear-gradient(135deg, var(--bg1), var(--bg2) 55%, var(--bg3));
     }
 
+    /* Visualizer canvas sits behind everything */
+    canvas#viz{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+    }
+
+    /* Confetti overlay */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:3;
+    }
+
     .wrap{
-      min-height:100%;
+      position:relative;
+      z-index:2;
+      height:100%;
       display:flex;
       align-items:center;
       justify-content:center;
       padding:22px;
-      position:relative;
     }
 
     .card{
@@ -45,35 +64,45 @@
       border:1px solid rgba(255,255,255,.6);
       border-radius:26px;
       box-shadow:var(--shadow);
-      padding:22px;
+      padding:20px;
       position:relative;
       overflow:hidden;
     }
 
+    .sparkle{
+      position:absolute;
+      inset:-40px;
+      background:
+        radial-gradient(2px 2px at 10% 15%, rgba(255,255,255,.85), transparent 60%),
+        radial-gradient(2px 2px at 30% 35%, rgba(255,255,255,.7), transparent 60%),
+        radial-gradient(2px 2px at 65% 25%, rgba(255,255,255,.75), transparent 60%),
+        radial-gradient(2px 2px at 80% 55%, rgba(255,255,255,.7), transparent 60%),
+        radial-gradient(2px 2px at 55% 70%, rgba(255,255,255,.75), transparent 60%),
+        radial-gradient(2px 2px at 20% 75%, rgba(255,255,255,.75), transparent 60%);
+      opacity:.45;
+      transform: rotate(-6deg);
+      pointer-events:none;
+    }
+
     .header{
       display:flex;
-      gap:18px;
+      gap:16px;
       align-items:center;
       justify-content:space-between;
       flex-wrap:wrap;
-    }
-
-    .title{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
+      position:relative;
+      z-index:1;
     }
 
     h1{
       margin:0;
       font-size:clamp(28px, 4.2vw, 56px);
-      letter-spacing:0.5px;
       line-height:1.0;
       text-shadow: 0 4px 0 rgba(255,255,255,.45);
     }
 
     .sub{
-      margin:0;
+      margin:6px 0 0 0;
       font-size:clamp(14px, 1.9vw, 18px);
       opacity:.85;
     }
@@ -91,43 +120,41 @@
       padding:10px 14px;
       border:1px dashed rgba(0,0,0,.25);
       background:rgba(255,255,255,.65);
-      font-weight:700;
-      letter-spacing:.2px;
+      font-weight:800;
       user-select:none;
+      white-space:nowrap;
     }
 
-    .grid{
-      margin-top:18px;
+    .content{
+      margin-top:16px;
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:16px;
-    }
-
-    @media (max-width: 860px){
-      .grid{ grid-template-columns: 1fr; }
-      .pillRow{ justify-content:flex-start; }
+      grid-template-columns: 1fr;
+      gap:14px;
+      position:relative;
+      z-index:1;
     }
 
     .panel{
       border-radius:22px;
-      background:rgba(255,255,255,.7);
+      background:rgba(255,255,255,.72);
       border:1px solid rgba(0,0,0,.08);
       padding:16px;
       box-shadow: 0 10px 30px rgba(0,0,0,.10);
-      position:relative;
     }
 
-    .hero{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+    .note{
+      margin:0;
+      font-size:14px;
+      opacity:.85;
+      line-height:1.35;
     }
 
-    .bigButton{
+    .controls{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       align-items:center;
+      margin-top:10px;
     }
 
     button{
@@ -139,40 +166,16 @@
       cursor:pointer;
       box-shadow: 0 10px 22px rgba(0,0,0,.18);
       transform: translateY(0);
-      transition: transform .08s ease, filter .12s ease;
+      transition: transform .08s ease, filter .12s ease, opacity .12s ease;
     }
     button:active{ transform: translateY(2px); }
+    button:disabled{ opacity:.55; cursor:not-allowed; }
 
-    .btnStart{
-      background:linear-gradient(135deg, #00ff9d, #00d4ff);
-    }
-    .btnStop{
-      background:linear-gradient(135deg, #ffd166, #ff6b6b);
-    }
-    .btnConfetti{
-      background:linear-gradient(135deg, #baffc9, #bae1ff);
-    }
-
-    .note{
-      margin:0;
-      font-size:14px;
-      opacity:.85;
-      line-height:1.35;
-    }
-
-    .audioBox{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-    }
+    .btnStart{ background:linear-gradient(135deg, #00ff9d, #00d4ff); }
+    .btnPause{ background:linear-gradient(135deg, #ffd166, #ff9f1c); }
+    .btnMute{ background:linear-gradient(135deg, #baffc9, #bae1ff); }
+    .btnConfetti{ background:linear-gradient(135deg, #ff8fab, #cdb4db); }
+    .btnStop{ background:linear-gradient(135deg, #ff6b6b, #ffd166); }
 
     .meter{
       width:100%;
@@ -180,8 +183,8 @@
       border-radius:999px;
       background:rgba(0,0,0,.08);
       overflow:hidden;
+      margin-top:10px;
     }
-
     .meter > i{
       display:block;
       height:100%;
@@ -191,26 +194,35 @@
       transition: width .12s linear;
     }
 
+    .row{
+      margin-top:8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
     .time{
       font-variant-numeric: tabular-nums;
-      font-weight:800;
+      font-weight:900;
       opacity:.85;
     }
 
+    /* Balloons */
     .balloons{
       position:absolute;
       inset:0;
       pointer-events:none;
       opacity:.9;
       filter: drop-shadow(0 10px 10px rgba(0,0,0,.12));
+      z-index:0;
     }
     .balloon{
       position:absolute;
       width:90px;
       height:120px;
       border-radius: 50% 50% 45% 45%;
-      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.75), transparent 38%),
-                  linear-gradient(135deg, rgba(255,255,255,.15), rgba(0,0,0,.08));
       animation: floatUp linear infinite;
     }
     .balloon:after{
@@ -235,14 +247,13 @@
       transform: translateX(-50%);
       border-radius:999px;
     }
-
     @keyframes floatUp{
       from { transform: translateY(20px); }
       to   { transform: translateY(-26px); }
     }
 
     .footer{
-      margin-top:14px;
+      margin-top:10px;
       display:flex;
       gap:12px;
       flex-wrap:wrap;
@@ -252,60 +263,60 @@
       font-size:13px;
     }
 
-    /* confetti canvas */
-    canvas#confetti{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:999;
-    }
+    /* No visible audio element */
+    audio{ display:none; }
 
-    /* small “sparkle” overlay inside card */
-    .sparkle{
-      position:absolute;
-      inset:-40px;
-      background:
-        radial-gradient(2px 2px at 10% 15%, rgba(255,255,255,.85), transparent 60%),
-        radial-gradient(2px 2px at 30% 35%, rgba(255,255,255,.7), transparent 60%),
-        radial-gradient(2px 2px at 65% 25%, rgba(255,255,255,.75), transparent 60%),
-        radial-gradient(2px 2px at 80% 55%, rgba(255,255,255,.7), transparent 60%),
-        radial-gradient(2px 2px at 55% 70%, rgba(255,255,255,.75), transparent 60%),
-        radial-gradient(2px 2px at 20% 75%, rgba(255,255,255,.75), transparent 60%);
-      opacity:.45;
-      transform: rotate(-6deg);
+    /* Small toast */
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:999px;
+      padding:10px 14px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.20);
+      z-index:4;
+      font-weight:800;
+      opacity:0;
       pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-2px);
     }
   </style>
 </head>
 
 <body>
+  <canvas id="viz"></canvas>
   <canvas id="confetti"></canvas>
+
+  <div class="toast" id="toast">ready</div>
 
   <div class="wrap">
     <div class="card" role="main" aria-label="Happy Birthday Page">
       <div class="sparkle"></div>
 
       <div class="balloons" aria-hidden="true">
-        <!-- Balloons: edit colors by changing --c on each balloon -->
-        <div class="balloon" style="--c:#ff2d55; left:6%; top:62%; animation-duration:4.8s; background:
+        <div class="balloon" style="left:6%; top:62%; animation-duration:4.8s; background:
           radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
           linear-gradient(135deg, #ff2d55, #ffa3c2);">
           <div class="string"></div>
         </div>
-
-        <div class="balloon" style="--c:#34c759; left:16%; top:18%; animation-duration:5.4s; background:
+        <div class="balloon" style="left:16%; top:18%; animation-duration:5.4s; background:
           radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
           linear-gradient(135deg, #34c759, #baffc9);">
           <div class="string"></div>
         </div>
-
-        <div class="balloon" style="--c:#007aff; left:78%; top:14%; animation-duration:6.2s; background:
+        <div class="balloon" style="left:78%; top:14%; animation-duration:6.2s; background:
           radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
           linear-gradient(135deg, #007aff, #9dd6ff);">
           <div class="string"></div>
         </div>
-
-        <div class="balloon" style="--c:#ffd60a; left:88%; top:58%; animation-duration:5.0s; background:
+        <div class="balloon" style="left:88%; top:58%; animation-duration:5.0s; background:
           radial-gradient(circle at 30% 25%, rgba(255,255,255,.8), transparent 38%),
           linear-gradient(135deg, #ffd60a, #fff2a8);">
           <div class="string"></div>
@@ -313,30 +324,32 @@
       </div>
 
       <div class="header">
-        <div class="title">
+        <div>
           <h1>HAPPY BIRTHDAY, JIM!!! 🎂🎈</h1>
-          <p class="sub">Official Celebration Portal. Extremely serious. Extremely tasteful. Definitely not annoying.</p>
+          <p class="sub">Cheesy on purpose. Built correctly on purpose. Unreasonably sparkly on purpose.</p>
         </div>
 
         <div class="pillRow">
           <div class="pill">BALLOONS: ✅</div>
           <div class="pill">CONFETTI: ✅</div>
-          <div class="pill">BIRTHDAY ENERGY: MAX</div>
+          <div class="pill">VIZ MODE: 🔥</div>
         </div>
       </div>
 
-      <div class="grid">
-        <section class="panel hero">
-          <h2 style="margin:0; font-size:22px;">Press this. It’s your birthday now.</h2>
-          <p class="note">
-            Modern browsers block true autoplay with sound until you click something (because society has learned, painfully,
-            that humans cannot be trusted). So this button starts the music and unlocks the party.
+      <div class="content">
+        <section class="panel">
+          <h2 style="margin:0; font-size:22px;">Press START. Your browser requires consent to be annoying.</h2>
+          <p class="note" style="margin-top:8px;">
+            Autoplay-with-sound is blocked until you click something (thanks, past internet crimes).
+            After that, it loops and the visualizer actually reacts to the music.
           </p>
 
-          <div class="bigButton">
+          <div class="controls">
             <button class="btnStart" id="startBtn" type="button">▶ START THE PARTY</button>
-            <button class="btnStop" id="stopBtn" type="button">⏸ STOP THE MUSIC (for cowards)</button>
+            <button class="btnPause" id="pauseBtn" type="button" disabled>⏸ PAUSE</button>
+            <button class="btnMute" id="muteBtn" type="button" disabled>🔊 MUTE</button>
             <button class="btnConfetti" id="confettiBtn" type="button">🎉 MORE CONFETTI</button>
+            <button class="btnStop" id="stopBtn" type="button" disabled>⏹ STOP</button>
           </div>
 
           <div class="meter" aria-label="Playback progress">
@@ -347,53 +360,40 @@
             <div class="time" id="time">0:00 / 5:00</div>
             <div class="time" id="status">ready</div>
           </div>
+        </section>
 
-          <p class="note" style="margin-top:2px;">
-            Music loops by default once started. You can pause it because this is a birthday page, not a crime.
+        <section class="panel">
+          <h3 style="margin:0 0 8px 0;">Birthday Message</h3>
+          <p class="note" style="margin:0;">
+            Jim: congratulations on surviving another year on Earth. Statistically impressive.
+            This page will now celebrate you with balloons, confetti, and irresponsible levels of audio-reactive glow.
           </p>
         </section>
 
-        <aside class="panel audioBox">
-          <h2 style="margin:0; font-size:18px;">Audio Controls</h2>
-
-          <audio id="player" preload="auto" loop controls style="width:100%;">
-            <!-- Put the MP3 in the same folder as index.html -->
-            <source src="happy-birthday-jim-5min-loop.mp3" type="audio/mpeg" />
-            Your browser refuses to party.
-          </audio>
-
-          <p class="note">
-            If you’re hosting on GitHub Pages, just commit <b>index.html</b> and <b>happy-birthday-jim-5min-loop.mp3</b>
-            into the repo root and enable Pages.
-          </p>
-
-          <div class="panel" style="background:rgba(255,255,255,.8);">
-            <h3 style="margin:0 0 8px 0;">Birthday Message</h3>
-            <p class="note" style="margin:0;">
-              Jim, congratulations on surviving another year on Earth. Statistically impressive.
-              Enjoy the balloons. You’re welcome.
-            </p>
-          </div>
-        </aside>
+        <div class="footer">
+          <div>Made with love, spite, and a working understanding of browsers.</div>
+          <div>Tip: the visualizer gets better once audio starts.</div>
+        </div>
       </div>
 
-      <div class="footer">
-        <div>Made with love, spite, and a suspicious amount of confetti.</div>
-        <div>Tip: click “MORE CONFETTI” if the vibes drop.</div>
-      </div>
+      <!-- Hidden audio (no native UI) -->
+      <audio id="player" preload="auto" loop>
+        <source src="happy-birthday-jim-5min-loop.mp3" type="audio/mpeg" />
+        Your browser refuses to party.
+      </audio>
     </div>
   </div>
 
   <script>
-    // ====== BASIC AUDIO UX ======
-    const player = document.getElementById("player");
-    const startBtn = document.getElementById("startBtn");
-    const stopBtn = document.getElementById("stopBtn");
-    const confettiBtn = document.getElementById("confettiBtn");
-    const bar = document.getElementById("bar");
-    const timeEl = document.getElementById("time");
-    const statusEl = document.getElementById("status");
-
+    // ===== Utilities =====
+    const toast = document.getElementById("toast");
+    let toastTimer = null;
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+    }
     function fmtTime(sec){
       sec = Math.max(0, Math.floor(sec));
       const m = Math.floor(sec/60);
@@ -401,29 +401,118 @@
       return `${m}:${s}`;
     }
 
+    // ===== Audio + WebAudio Analyzer =====
+    const player = document.getElementById("player");
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const muteBtn  = document.getElementById("muteBtn");
+    const stopBtn  = document.getElementById("stopBtn");
+
+    const statusEl = document.getElementById("status");
+    const timeEl = document.getElementById("time");
+    const bar = document.getElementById("bar");
+
+    // Visualizer canvas
+    const viz = document.getElementById("viz");
+    const vctx = viz.getContext("2d");
+    function resizeViz(){
+      viz.width = window.innerWidth * devicePixelRatio;
+      viz.height = window.innerHeight * devicePixelRatio;
+      vctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    window.addEventListener("resize", resizeViz);
+    resizeViz();
+
+    let audioCtx = null;
+    let analyser = null;
+    let data = null;
+    let sourceNode = null;
+    let gainNode = null;
+
+    let running = false;
+    let muted = false;
+
+    // Display time is fixed at 5:00 even if the file metadata is slightly off
+    const DISPLAY_TOTAL = 300;
+
+    async function initAudioGraph(){
+      if (audioCtx) return;
+
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048; // gives good bar resolution
+      analyser.smoothingTimeConstant = 0.8;
+
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = 1.0;
+
+      // Create a MediaElement source from the <audio>
+      sourceNode = audioCtx.createMediaElementSource(player);
+
+      sourceNode.connect(analyser);
+      analyser.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      data = new Uint8Array(analyser.frequencyBinCount);
+    }
+
     async function startParty(){
       try{
+        await initAudioGraph();
+        // resume context (required after user gesture)
+        await audioCtx.resume();
+
+        player.loop = true;
         await player.play();
+
+        running = true;
+        pauseBtn.disabled = false;
+        muteBtn.disabled = false;
+        stopBtn.disabled = false;
+
         statusEl.textContent = "playing";
-        burstConfetti(240);
+        showToast("PARTY MODE: ON");
+        burstConfetti(260);
       }catch(e){
-        statusEl.textContent = "click blocked autoplay";
+        statusEl.textContent = "blocked (click again)";
+        showToast("Browser blocked it. Click START again.");
       }
     }
 
-    function stopMusic(){
+    function pauseToggle(){
+      if (!running) return;
+      if (player.paused){
+        player.play();
+        statusEl.textContent = "playing";
+        showToast("playing");
+      }else{
+        player.pause();
+        statusEl.textContent = "paused";
+        showToast("paused");
+      }
+    }
+
+    function stopAll(){
       player.pause();
-      statusEl.textContent = "paused";
+      player.currentTime = 0;
+      statusEl.textContent = "stopped";
+      showToast("stopped");
+    }
+
+    function muteToggle(){
+      if (!gainNode) return;
+      muted = !muted;
+      gainNode.gain.value = muted ? 0.0 : 1.0;
+      muteBtn.textContent = muted ? "🔇 UNMUTE" : "🔊 MUTE";
+      showToast(muted ? "muted" : "unmuted");
     }
 
     startBtn.addEventListener("click", startParty);
-    stopBtn.addEventListener("click", stopMusic);
+    pauseBtn.addEventListener("click", pauseToggle);
+    muteBtn.addEventListener("click", muteToggle);
+    stopBtn.addEventListener("click", stopAll);
 
-    player.addEventListener("play", () => statusEl.textContent = "playing");
-    player.addEventListener("pause", () => statusEl.textContent = "paused");
-
-    // Progress bar (uses currentTime; duration may vary by encoding, so we clamp to 5:00 display)
-    const DISPLAY_TOTAL = 300; // 5 minutes
+    // Progress bar
     function tick(){
       const t = player.currentTime || 0;
       const pct = Math.min(100, (t / DISPLAY_TOTAL) * 100);
@@ -433,15 +522,125 @@
     }
     tick();
 
-    // ====== CONFETTI (CANVAS) ======
-    const canvas = document.getElementById("confetti");
-    const ctx = canvas.getContext("2d");
-    let W = canvas.width = window.innerWidth;
-    let H = canvas.height = window.innerHeight;
+    // ===== Visualizer drawing =====
+    // It reacts to frequency data and adds a pulsing glow using the low frequencies (bass energy).
+    function drawViz(){
+      requestAnimationFrame(drawViz);
+
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+
+      // Soft fade background (gives trail + "flash" feeling)
+      vctx.fillStyle = "rgba(0,0,0,0.12)";
+      vctx.fillRect(0, 0, W, H);
+
+      // If not running yet, draw a gentle idle shimmer
+      if (!analyser || !data || player.paused){
+        // idle glow
+        const t = performance.now() * 0.001;
+        const r = Math.sin(t) * 0.5 + 0.5;
+        vctx.save();
+        vctx.globalAlpha = 0.22;
+        vctx.beginPath();
+        vctx.arc(W*0.5, H*0.5, 140 + r*60, 0, Math.PI*2);
+        vctx.fillStyle = "rgba(255,255,255,0.08)";
+        vctx.fill();
+        vctx.restore();
+        return;
+      }
+
+      analyser.getByteFrequencyData(data);
+
+      // Bass energy estimate
+      let bass = 0;
+      const bassBins = Math.min(30, data.length);
+      for (let i = 0; i < bassBins; i++) bass += data[i];
+      bass /= bassBins;
+      const bassNorm = bass / 255; // 0..1
+
+      // Pulse overlay
+      vctx.save();
+      vctx.globalAlpha = 0.10 + bassNorm * 0.18;
+      vctx.fillStyle = "rgba(255,255,255,0.08)";
+      vctx.fillRect(0, 0, W, H);
+      vctx.restore();
+
+      // Bars
+      const barCount = 90;
+      const step = Math.floor(data.length / barCount);
+      const padding = 10;
+      const usableW = W - padding*2;
+      const barW = usableW / barCount;
+      const midY = H * 0.68;
+
+      // Glow “shelf”
+      vctx.save();
+      vctx.globalAlpha = 0.18 + bassNorm * 0.25;
+      vctx.beginPath();
+      vctx.ellipse(W*0.5, midY + 30, W*0.35, 90 + bassNorm*80, 0, 0, Math.PI*2);
+      vctx.fillStyle = "rgba(255,255,255,0.10)";
+      vctx.fill();
+      vctx.restore();
+
+      for (let i = 0; i < barCount; i++){
+        const idx = i * step;
+        const val = data[idx] / 255; // 0..1
+
+        // Height scaling: emphasize mids, keep it punchy
+        const h = (val ** 1.15) * (H * 0.55);
+
+        const x = padding + i * barW;
+        const y = midY - h;
+
+        // Flash factor using bass
+        const alpha = 0.25 + val * 0.65;
+
+        // Simple color cycling via x position (no hard-coded palette)
+        const hue = (i / barCount) * 360;
+
+        vctx.save();
+        vctx.globalAlpha = alpha;
+
+        // glow
+        vctx.shadowBlur = 18 + bassNorm * 30;
+        vctx.shadowColor = `hsla(${hue}, 95%, 60%, 0.8)`;
+
+        vctx.fillStyle = `hsla(${hue}, 95%, 60%, 0.85)`;
+        roundRect(vctx, x + 1, y, barW - 3, h, 10);
+        vctx.fill();
+
+        // cap
+        vctx.globalAlpha = Math.min(1, alpha + 0.2);
+        vctx.fillStyle = `hsla(${hue}, 100%, 88%, 0.95)`;
+        roundRect(vctx, x + 1, y - 8, barW - 3, 7, 10);
+        vctx.fill();
+
+        vctx.restore();
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      r = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+r, y);
+      ctx.arcTo(x+w, y, x+w, y+h, r);
+      ctx.arcTo(x+w, y+h, x, y+h, r);
+      ctx.arcTo(x, y+h, x, y, r);
+      ctx.arcTo(x, y, x+w, y, r);
+      ctx.closePath();
+    }
+
+    drawViz();
+
+    // ===== Confetti =====
+    const confettiCanvas = document.getElementById("confetti");
+    const cctx = confettiCanvas.getContext("2d");
+    let CW = confettiCanvas.width = window.innerWidth;
+    let CH = confettiCanvas.height = window.innerHeight;
 
     window.addEventListener("resize", () => {
-      W = canvas.width = window.innerWidth;
-      H = canvas.height = window.innerHeight;
+      CW = confettiCanvas.width = window.innerWidth;
+      CH = confettiCanvas.height = window.innerHeight;
     });
 
     const confetti = [];
@@ -450,8 +649,8 @@
     function addConfetti(n){
       for(let i=0;i<n;i++){
         confetti.push({
-          x: rand(0, W),
-          y: rand(-20, H * 0.25),
+          x: rand(0, CW),
+          y: rand(-20, CH * 0.25),
           vx: rand(-2.0, 2.0),
           vy: rand(2.5, 6.0),
           r: rand(3, 8),
@@ -462,15 +661,16 @@
       }
     }
 
-    function burstConfetti(n){
-      addConfetti(n);
-    }
+    function burstConfetti(n){ addConfetti(n); }
 
-    confettiBtn.addEventListener("click", () => burstConfetti(400));
+    document.getElementById("confettiBtn").addEventListener("click", () => {
+      burstConfetti(420);
+      showToast("confetti deployed");
+    });
 
-    function draw(){
-      ctx.clearRect(0,0,W,H);
-      ctx.save();
+    function drawConfetti(){
+      cctx.clearRect(0,0,CW,CH);
+      cctx.save();
       for(let i=confetti.length-1;i>=0;i--){
         const p = confetti[i];
         p.x += p.vx;
@@ -480,31 +680,28 @@
         p.vy *= 0.998;
         p.life -= 1;
 
-        // Wrap a bit
-        if(p.x < -20) p.x = W + 20;
-        if(p.x > W + 20) p.x = -20;
+        if(p.x < -20) p.x = CW + 20;
+        if(p.x > CW + 20) p.x = -20;
 
-        // If offscreen or dead, remove
-        if(p.y > H + 30 || p.life <= 0){
+        if(p.y > CH + 30 || p.life <= 0){
           confetti.splice(i,1);
           continue;
         }
 
-        // Color cycle without specifying “a theme palette” too rigidly
         const hue = (p.y * 0.8 + p.x * 0.2) % 360;
-        ctx.fillStyle = `hsla(${hue}, 95%, 60%, 0.9)`;
+        cctx.fillStyle = `hsla(${hue}, 95%, 60%, 0.9)`;
 
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.a);
-        ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
-        ctx.setTransform(1,0,0,1,0,0);
+        cctx.translate(p.x, p.y);
+        cctx.rotate(p.a);
+        cctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
+        cctx.setTransform(1,0,0,1,0,0);
       }
-      ctx.restore();
-      requestAnimationFrame(draw);
+      cctx.restore();
+      requestAnimationFrame(drawConfetti);
     }
-    draw();
+    drawConfetti();
 
-    // A small celebratory burst on load (silent, because autoplay is blocked anyway)
+    // Little burst on load (silent)
     burstConfetti(160);
   </script>
 </body>
